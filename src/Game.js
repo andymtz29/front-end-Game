@@ -22,19 +22,30 @@ class Game{
     getUserName(){
         return this.#userName;
     }
+    setVidaa(valor) {
+        this.#vida = Math.min(valor, 100); // Asegura que no pase de 100
+    }
+    
     setVida(decremento){
         this.#vida -= decremento;
         this.#vida < 0 ? this.#vida = 0 : false;
     }
+
+    setKi(valor) {
+        this.#ki = Math.min(valor, 80); // Evita que pase de 80
+    }
+    setEnergia(valor) {
+        this.#energia = Math.min(valor, 90); // Evita que pase de 90
+    }  
+
     atk_basico(jugador) {
         this.#ki = Math.max(this.#ki - 5, 0);
         this.#energia = Math.max(this.#energia - 10, 0);
         jugador.setVida(15);
     }
-
     atk_esp(jugador) {
-        this.#ki = Math.max(this.#ki - 15, 0);
-        this.#energia = Math.max(this.#energia - 15, 0);
+        this.#ki = Math.max(this.#ki - 20, 0);  // Aumenta la reducción de Ki
+        this.#energia = Math.max(this.#energia - 25, 0);  // Aumenta la reducción de Energía
         jugador.setVida(30);
     }
 

@@ -3,3 +3,36 @@ body{
     background-size: cover;
     background-position: center center;
 }
+
+
+.historial-container {
+    background-color: #eef4f900; /* Fondo blanco para un look más limpio */
+    border: 1px solid #fffcfc00; /* Borde más delgado y suave */
+    border-radius: 12px; /* Bordes más redondeados */
+    padding: 15px; /* Más espacio interno */
+    margin: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más suave y difuminada */
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.historial-container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.historial-container p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.historial-container .ganador {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.historial-container .perdedor {
+    color: #dc3545;
+    font-weight: bold;
+}

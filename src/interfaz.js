@@ -1,23 +1,67 @@
 import Swal from 'sweetalert2';
 import Game from './Game.js';
 
+// Variables globales
 let btn_player1 = document.getElementById('btn_player1');
 let btn_player2 = document.getElementById('btn_player2');
 let player1, player2, pj1 = '', pj2 = '', aceptar = 0;
-let turno = 1; // 1 para Jugador 1, 2 para Jugador 2
+let turno = 1;
+let turnosJugador1 = 0;
+let turnosJugador2 = 0;
 
-// Función para alternar el turno
+
+const iniciarMusicaFondo = () => {
+    const musicaFondo = document.getElementById('musica-fondo');
+    if (musicaFondo) {
+        musicaFondo.volume = 0.5; // Ajusta el volumen (opcional)
+        musicaFondo.play(); // Inicia la música
+    } else {
+        console.error('El elemento de música de fondo no se encontró.');
+    }
+};
+const historial = {
+    player1: {
+        victorias: 0,
+        derrotas: 0
+    },
+    player2: {
+        victorias: 0,
+        derrotas: 0
+    }
+};
+
+// Función para alternar el turno entre jugadores
 const alternarTurno = () => {
+    if (turno === 1) {
+        turnosJugador1++; // Incrementar el contador de turnos del Jugador 1
+    } else {
+        turnosJugador2++; // Incrementar el contador de turnos del Jugador 2
+    }
     turno = turno === 1 ? 2 : 1; // Cambia el turno
     actualizarBotones(); // Actualiza los botones según el turno
 };
 
-// Función para actualizar los botones según el turno
+// Función para actualizar el historial de victorias y derrotas
+const actualizarHistorial = (ganador, perdedor) => {
+    historial[ganador].victorias++;
+    historial[perdedor].derrotas++;
+
+    const historialElement = document.getElementById('historial');
+    if (historialElement) {
+        historialElement.innerHTML = `
+            <p><span class="ganador">Jugador 1</span> - Victorias: ${historial.player1.victorias} | Derrotas: ${historial.player1.derrotas}</p>
+            <p><span class="perdedor">Jugador 2</span> - Victorias: ${historial.player2.victorias} | Derrotas: ${historial.player2.derrotas}</p>
+        `;
+    } else {
+        console.error('El elemento con id "historial" no existe en el DOM.');
+    }
+};
+
 const actualizarBotones = () => {
     if (turno === 1) {
         // Habilitar botones del Jugador 1 y deshabilitar los del Jugador 2
         document.getElementById('btn_atk_py1').disabled = false;
-        document.getElementById('btn_esp_py1').disabled = false;
+        document.getElementById('btn_esp_py1').disabled = turnosJugador1 % 2 !== 0; // Solo habilitar si es par
         document.getElementById('btn_ermi_py1').disabled = false;
         document.getElementById('btn_ki_py1').disabled = false;
 
@@ -28,7 +72,7 @@ const actualizarBotones = () => {
     } else {
         // Habilitar botones del Jugador 2 y deshabilitar los del Jugador 1
         document.getElementById('btn_atk_py1').disabled = true;
-        document.getElementById('btn_esp_py1').disabled = true;
+        document.getElementById('btn_esp_py1').disabled = turnosJugador2 % 2 !== 0; // Solo habilitar si es par
         document.getElementById('btn_ermi_py1').disabled = true;
         document.getElementById('btn_ki_py1').disabled = true;
 
@@ -39,7 +83,8 @@ const actualizarBotones = () => {
     }
 };
 
-// Función para iniciar el jugador 1
+
+// Lógica para iniciar el juego
 const iniciar_player1 = () => {
     document.getElementById('player1').classList.add("d-none");
     aceptar++;
@@ -70,12 +115,12 @@ const iniciar_player1 = () => {
                     icon: "success"
                 });
                 actualizarBotones(); // Habilitar botones del Jugador 1 al inicio
+                iniciarMusicaFondo(); // Iniciar la música de fondo
             }
         });
     }
 };
 
-// Función para iniciar el jugador 2
 const iniciar_player2 = () => {
     document.getElementById('player2').classList.add("d-none");
     aceptar++;
@@ -106,52 +151,42 @@ const iniciar_player2 = () => {
                     icon: "success"
                 });
                 actualizarBotones(); // Habilitar botones del Jugador 1 al inicio
+                iniciarMusicaFondo(); // Iniciar la música de fondo
             }
         });
     }
 };
 
-// Selección de personaje para el jugador 1
+// Selección de personajes
 let seleccion1 = document.getElementById('player1_seleccion');
 seleccion1.addEventListener('click', (event) => {
     if (event.target.tagName === 'IMG') {
-        pj1 = event.target.alt; // Asigna el nombre del personaje
-
-        // Remueve la clase 'btn-warning' de todas las imágenes y agrega 'btn-danger'
+        pj1 = event.target.alt;
         seleccion1.querySelectorAll('img').forEach((img) => {
             img.classList.remove('btn-warning');
             img.classList.add('btn-danger');
         });
-
-        // Agrega la clase 'btn-warning' a la imagen seleccionada
         event.target.classList.remove('btn-danger');
         event.target.classList.add('btn-warning');
-
-        console.log("Personaje 1 seleccionado:", pj1); // Depuración
+        console.log("Personaje 1 seleccionado:", pj1);
     }
 });
 
-// Selección de personaje para el jugador 2
 let seleccion2 = document.getElementById('player2_seleccion');
 seleccion2.addEventListener('click', (event) => {
     if (event.target.tagName === 'IMG') {
-        pj2 = event.target.alt; // Asigna el nombre del personaje
-
-        // Remueve la clase 'btn-warning' de todas las imágenes y agrega 'btn-danger'
+        pj2 = event.target.alt;
         seleccion2.querySelectorAll('img').forEach((img) => {
             img.classList.remove('btn-warning');
             img.classList.add('btn-danger');
         });
-
-        // Agrega la clase 'btn-warning' a la imagen seleccionada
         event.target.classList.remove('btn-danger');
         event.target.classList.add('btn-warning');
-
-        console.log("Personaje 2 seleccionado:", pj2); // Depuración
+        console.log("Personaje 2 seleccionado:", pj2);
     }
 });
 
-// Iniciar jugador 1
+// Eventos para los botones de inicio
 btn_player1.addEventListener('click', () => {
     let user_name1 = document.getElementById('user_name1').value;
     if (!user_name1) {
@@ -176,7 +211,6 @@ btn_player1.addEventListener('click', () => {
     }
 });
 
-// Iniciar jugador 2
 btn_player2.addEventListener('click', () => {
     let user_name2 = document.getElementById('user_name2').value;
     if (!user_name2) {
@@ -200,8 +234,72 @@ btn_player2.addEventListener('click', () => {
         }
     }
 });
-//Jugador 1 ---------------------------------------------------------------------------
-// Ataque básico jugador 1
+
+// Función para reiniciar los valores del juego (vida, ki, energía, etc.)
+const reiniciarValores = () => {
+    player1.setVidaa(100); // Restablece la vida del jugador 1 a 100
+    player1.setKi(80); // Restablece el ki del jugador 1 a 80
+    player1.setEnergia(90); // Restablece la energía del jugador 1 a 90
+    
+    player2.setVidaa(100); // Restablece la vida del jugador 2 a 100
+    player2.setKi(80); // Restablece el ki del jugador 2 a 80
+    player2.setEnergia(90); // Restablece la energía del jugador 2 a 90
+
+    // Restablecer las semillas del ermitaño
+    document.getElementById('se_p1').innerText = 3; // Restablece las semillas del Jugador 1 a 3
+    document.getElementById('se_p2').innerText = 3; // Restablece las semillas del Jugador 2 a 3
+    
+
+    // Actualizar las barras de progreso en la interfaz
+    actualizarBarra("vida_py1", 100);
+    actualizarBarra("ki_py1", 100);
+    actualizarBarra("energia_py1", 100);
+
+    actualizarBarra("vida_py2", 100);
+    actualizarBarra("ki_py2", 100);
+    actualizarBarra("energia_py2", 100);
+
+    // Reiniciar los contadores de turnos
+    turnosJugador1 = 0;
+    turnosJugador2 = 0;
+
+    // Reiniciar el turno al Jugador 1
+    turno = 1;
+    actualizarBotones();
+};
+
+// Función auxiliar para actualizar la barra de progreso
+const actualizarBarra = (id, porcentaje) => {
+    document.getElementById(id).style.width = `${porcentaje}%`;
+    document.getElementById(id).innerText = `${porcentaje}%`;
+};
+
+// Modificar el diálogo de fin de juego para ofrecer revancha
+const mostrarDialogoRevancha = (mensaje, ganador, perdedor) => {
+    const sonidoDerrota = document.getElementById('sonido-derrota');
+    if (sonidoDerrota) sonidoDerrota.play(); // Reproduce el sonido
+    actualizarHistorial(ganador, perdedor);
+    Swal.fire({
+        title: "¡GAME OVER!",
+        text: mensaje,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Revancha",
+        cancelButtonText: "Reiniciar todo",
+        allowOutsideClick: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Reiniciar valores pero conservar personajes
+            reiniciarValores();
+        } else {
+            // Reiniciar todo el juego
+            location.reload();
+        }
+    });
+};
+
+
+//Jugador 1 -----------------------------------------------------------------------------------------------------------------------------------
 document.getElementById("btn_atk_py1").addEventListener('click', () => {
     if (player1.getKi() < 5 || player1.getEnergia() < 10) {
         Swal.fire({
@@ -241,23 +339,24 @@ document.getElementById("btn_atk_py1").addEventListener('click', () => {
         });
 
         if (vidaJugador2 <= 0) {
-            Swal.fire({
-                title: "¡GAME OVER!",
-                text: "El Jugador 2 ha sido derrotado 🏆",
-                icon: "warning",
-                confirmButtonText: "Reiniciar",
-                allowOutsideClick: false
-            }).then(() => {
-                location.reload();
-            });
+            mostrarDialogoRevancha("El Jugador 2 ha sido derrotado 🏆","player1","player2");
         } else {
             alternarTurno(); // Cambia el turno al Jugador 2
         }
     }
 });
 
-// Ataque especial jugador 1
 document.getElementById("btn_esp_py1").addEventListener('click', () => {
+        if (turnosJugador1 % 2 !== 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Ataque especial no disponible",
+                text: "¡Solo puedes usar el ataque especial cada dos turnos!",
+                color: "#d33",
+                background: "#f5f5f5",
+            });
+            return;
+        }
     if (player1.getKi() < 10 || player1.getEnergia() < 20) {
         Swal.fire({
             icon: "error",
@@ -296,22 +395,13 @@ document.getElementById("btn_esp_py1").addEventListener('click', () => {
         });
 
         if (vidaJugador2 <= 0) {
-            Swal.fire({
-                title: "¡GAME OVER!",
-                text: "El Jugador 2 ha sido derrotado🚫",
-                icon: "warning",
-                confirmButtonText: "Reiniciar",
-                allowOutsideClick: false
-            }).then(() => {
-                location.reload();
-            });
+            mostrarDialogoRevancha("El Jugador 2 ha sido derrotado 🏆","player1","player2");
         } else {
             alternarTurno(); // Cambia el turno al Jugador 2
         }
     }
 });
 
-// Semillas del ermitaño jugador 1
 document.getElementById("btn_ermi_py1").addEventListener('click', () => {
     let semilla_Span = document.getElementById('se_p1');
     let contador_semilla = parseInt(semilla_Span.innerText);
@@ -345,7 +435,7 @@ document.getElementById("btn_ermi_py1").addEventListener('click', () => {
                 popup: 'custom-swal'
             },
             didOpen: () => {
-                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, yellow, gray)';
+                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, red, gray)';
                 document.querySelector('.swal2-popup').style.color = 'white';
                 document.querySelector('.swal2-popup').style.borderRadius = '20px';
             }
@@ -360,7 +450,6 @@ document.getElementById("btn_ermi_py1").addEventListener('click', () => {
     alternarTurno(); // Cambia el turno al Jugador 2
 });
 
-// Regeneración de ki jugador 1
 document.getElementById("btn_ki_py1").addEventListener('click', () => {
     if (player1.getKi() >= 80) {
         Swal.fire({
@@ -389,7 +478,7 @@ document.getElementById("btn_ki_py1").addEventListener('click', () => {
                 popup: 'custom-swal'
             },
             didOpen: () => {
-                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, yellow, gray)';
+                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, red, blue)';
                 document.querySelector('.swal2-popup').style.color = 'white';
                 document.querySelector('.swal2-popup').style.borderRadius = '20px';
             }
@@ -397,8 +486,8 @@ document.getElementById("btn_ki_py1").addEventListener('click', () => {
     }
     alternarTurno(); // Cambia el turno al Jugador 2
 });
-//Jugador 2 ---------------------------------------------------------------------------
-// Ataque básico jugador 2
+//Jugador 2 ----------------------------------------------------------------------------------------------------------------------------------------------------
+
 document.getElementById("btn_atk_py2").addEventListener('click', () => {
     if (player2.getKi() < 5 || player2.getEnergia() < 10) {
         Swal.fire({
@@ -438,23 +527,24 @@ document.getElementById("btn_atk_py2").addEventListener('click', () => {
         });
 
         if (vidaJugador1 <= 0) {
-            Swal.fire({
-                title: "¡GAME OVER!",
-                text: "El Jugador 1 ha sido derrotado😵",
-                icon: "warning",
-                confirmButtonText: "Reiniciar",
-                allowOutsideClick: false
-            }).then(() => {
-                location.reload();
-            });
+            mostrarDialogoRevancha("El Jugador 1  ha sido derrotado 🏆","player2","player1");
         } else {
-            alternarTurno(); // Cambia el turno al Jugador 1
+            alternarTurno(); // Cambia el turno al Jugador 2
         }
     }
 });
 
-// Ataque especial jugador 2
 document.getElementById("btn_esp_py2").addEventListener('click', () => {
+        if (turnosJugador2 % 2 !== 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Ataque especial no disponible",
+                text: "¡Solo puedes usar el ataque especial cada dos turnos!",
+                color: "#d33",
+                background: "#f5f5f5",
+            });
+            return;
+        }
     if (player2.getKi() < 10 || player2.getEnergia() < 20) {
         Swal.fire({
             icon: "error",
@@ -493,21 +583,12 @@ document.getElementById("btn_esp_py2").addEventListener('click', () => {
         });
 
         if (vidaJugador1 <= 0) {
-            Swal.fire({
-                title: "¡GAME OVER!",
-                text: "El Jugador 1 ha sido derrotado 😵",
-                icon: "warning",
-                confirmButtonText: "Reiniciar",
-                allowOutsideClick: false
-            }).then(() => {
-                location.reload();
-            });
+            mostrarDialogoRevancha("El Jugador 1 ha sido derrotado 🏆","player2","player1");
         } else {
-            alternarTurno(); // Cambia el turno al Jugador 1
+            alternarTurno(); // Cambia el turno al Jugador 2
         }
     }
 });
-
 
 document.getElementById("btn_ermi_py2").addEventListener('click', () => {
     let semilla_Span = document.getElementById('se_p2');
@@ -542,7 +623,7 @@ document.getElementById("btn_ermi_py2").addEventListener('click', () => {
                 popup: 'custom-swal'
             },
             didOpen: () => {
-                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, yellow, gray)';
+                document.querySelector('.swal2-popup').style.background = 'linear-gradient(to bottom right, red, blue)';
                 document.querySelector('.swal2-popup').style.color = 'white';
                 document.querySelector('.swal2-popup').style.borderRadius = '20px';
             }
@@ -556,7 +637,6 @@ document.getElementById("btn_ermi_py2").addEventListener('click', () => {
     }
     alternarTurno(); 
 });
-
 
 document.getElementById("btn_ki_py2").addEventListener('click', () => {
     if (player2.getKi() >= 80) {
